@@ -76,6 +76,7 @@ nurbs_curve_3D = NurbsCurve(control_points, weights, knot_vector)
 CurveVisualizer(nurbs_curve_2d)
 ```
 
+![curve_plot](https://user-images.githubusercontent.com/62465061/130354532-21a82925-5ba3-41d8-abce-280fceb64000.gif)
 
 *Note - Alternative automatic generation of uniform open knot vectors (here for
 8 control points and polynomial degree 2):*
@@ -170,6 +171,7 @@ nurbs_surface = nurbsgeometry.NurbsSurface(control_points, weights, knot_vector)
 SurfaceVisualizer(nurbs_surface)
 ```
 
+![surface_plot](https://user-images.githubusercontent.com/62465061/130354540-3fde5a8e-d71b-49cc-888a-6226b1f16854.gif)
 
 #### Interaction
 
