@@ -1,6 +1,7 @@
 import numpy as np
-from nurbsvisualizer.utilities import is_open, evaluate_bspline_basis
+
 from nurbsvisualizer.bsplinegeometry import BsplineCurve, BsplineSurface
+from nurbsvisualizer.utilities import evaluate_bspline_basis, is_open
 
 
 class NurbsCurve(BsplineCurve):
@@ -62,7 +63,9 @@ class NurbsCurve(BsplineCurve):
             If value isn't a np.ndarray or a tuple or a list.
         """
         if np.shape(value)[0] != self.control_points_count:
-            raise ValueError("the number of weights should be the same as the number of control points")
+            raise ValueError(
+                "the number of weights should be the same as the number of control points"
+            )
         elif isinstance(value, np.ndarray):
             self._weights = value
         elif isinstance(value, (tuple, list)):
@@ -100,8 +103,12 @@ class NurbsCurve(BsplineCurve):
         This method overrides BsplineCurve.evaluate_basis.
         """
         # Evaluate the BSpline basis with the Cox-De Boor's algorithm
-        evaluations = evaluate_bspline_basis(self.polynomial_degree, self.knot_vector,
-                                                       self.control_points_count, self.samples)
+        evaluations = evaluate_bspline_basis(
+            self.polynomial_degree,
+            self.knot_vector,
+            self.control_points_count,
+            self.samples,
+        )
 
         # Multiply basis evaluations with the corresponding weights (numerator of rational basis formula)
         weighted_evaluations = np.reshape(self.weights, (-1, 1)) * evaluations
@@ -172,7 +179,9 @@ class NurbsSurface(BsplineSurface):
             If value isn't a np.ndarray or a tuple or a list.
         """
         if np.shape(value) != self.control_points[0].shape:
-            raise ValueError("the shape of the weights grid doesn't match the shape of the control points grid")
+            raise ValueError(
+                "the shape of the weights grid doesn't match the shape of the control points grid"
+            )
         elif isinstance(value, np.ndarray):
             self._weights = value
         elif isinstance(value, (tuple, list)):
@@ -197,8 +206,11 @@ class NurbsSurface(BsplineSurface):
         NotImplementedError
             If value is a non-open knot vector.
         """
-        if not is_open(value[0], np.shape(value[0])[0] - self.control_points_count[0] - 1) or\
-            not is_open(value[1], np.shape(value[1])[0] - self.control_points_count[1] - 1):
+        if not is_open(
+            value[0], np.shape(value[0])[0] - self.control_points_count[0] - 1
+        ) or not is_open(
+            value[1], np.shape(value[1])[0] - self.control_points_count[1] - 1
+        ):
             raise NotImplementedError("non-open knot vectors aren't supported")
 
         # Call the B-spline knot_vector setter
@@ -211,14 +223,28 @@ class NurbsSurface(BsplineSurface):
         This method overrides BsplineSurface.evaluate_basis.
         """
         # Initialize the array of basis evaluations
-        self._basis_evals = np.zeros((self.control_points_count[0], self.control_points_count[1],
-                                self.samples_count[0], self.samples_count[1]))
+        self._basis_evals = np.zeros(
+            (
+                self.control_points_count[0],
+                self.control_points_count[1],
+                self.samples_count[0],
+                self.samples_count[1],
+            )
+        )
 
         # Evaluate the BSpline basis for each parameter space dimension with the Cox-De Boor's algorithm
-        evaluations_xi = evaluate_bspline_basis(self.polynomial_degree[0], self.knot_vector[0],
-                                                          self.control_points_count[0], self.samples[0])
-        evaluations_eta = evaluate_bspline_basis(self.polynomial_degree[1], self.knot_vector[1],
-                                                           self.control_points_count[1], self.samples[1])
+        evaluations_xi = evaluate_bspline_basis(
+            self.polynomial_degree[0],
+            self.knot_vector[0],
+            self.control_points_count[0],
+            self.samples[0],
+        )
+        evaluations_eta = evaluate_bspline_basis(
+            self.polynomial_degree[1],
+            self.knot_vector[1],
+            self.control_points_count[1],
+            self.samples[1],
+        )
 
         # Compute the tensor product of basis evaluations in each parameter dimension and multiply each entry of the
         # result with the corresponding weight (numerator of rational basis formula).

@@ -31,13 +31,19 @@ def cox_de_boor(knot_span, polynomial_degree, parameter, knot_vector):
         If parameter is not between the first and last knot values.
     """
     if parameter < knot_vector[0] or parameter > knot_vector[-1]:
-        raise ValueError("parameter value should be between the first and last knot values")
+        raise ValueError(
+            "parameter value should be between the first and last knot values"
+        )
 
     # Base case
     if polynomial_degree == 0:
-        is_end_of_parameter_space = np.isclose(parameter, knot_vector[knot_span + 1]) and \
-                                    np.isclose(parameter, knot_vector[-1])
-        if knot_vector[knot_span] <= parameter < knot_vector[knot_span + 1] or is_end_of_parameter_space:
+        is_end_of_parameter_space = np.isclose(
+            parameter, knot_vector[knot_span + 1]
+        ) and np.isclose(parameter, knot_vector[-1])
+        if (
+            knot_vector[knot_span] <= parameter < knot_vector[knot_span + 1]
+            or is_end_of_parameter_space
+        ):
             return 1.0
         else:
             return 0.0
@@ -58,8 +64,11 @@ def cox_de_boor(knot_span, polynomial_degree, parameter, knot_vector):
         q2 = cox_de_boor_division(n2, d2)
 
         # Cox-De Boor's recursion formula
-        return q1 * cox_de_boor(knot_span, polynomial_degree - 1, parameter, knot_vector) + \
-               q2 * cox_de_boor(knot_span + 1, polynomial_degree - 1, parameter, knot_vector)
+        return q1 * cox_de_boor(
+            knot_span, polynomial_degree - 1, parameter, knot_vector
+        ) + q2 * cox_de_boor(
+            knot_span + 1, polynomial_degree - 1, parameter, knot_vector
+        )
 
 
 def cox_de_boor_division(numerator, denominator):
@@ -85,7 +94,9 @@ def cox_de_boor_division(numerator, denominator):
         return numerator / denominator
 
 
-def evaluate_bspline_basis(polynomial_degree, knot_vector, control_points_count, samples):
+def evaluate_bspline_basis(
+    polynomial_degree, knot_vector, control_points_count, samples
+):
     """
     Evaluate the B-spline basis function for the given samples.
 
@@ -116,7 +127,9 @@ def evaluate_bspline_basis(polynomial_degree, knot_vector, control_points_count,
         # Perform the computation only where the shape function i has support
         for j, sample in enumerate(samples):
             if first_nonzero_sample <= sample <= last_nonzero_sample:
-                evaluations[i, j] = cox_de_boor(i, polynomial_degree, sample, knot_vector)
+                evaluations[i, j] = cox_de_boor(
+                    i, polynomial_degree, sample, knot_vector
+                )
 
     return evaluations
 
@@ -178,8 +191,10 @@ def is_open(knot_vector, polynomial_degree):
     for i in range(1, polynomial_degree + 1):
         if knot_vector[0] != knot_vector[i] or knot_vector[-1] != knot_vector[-1 - i]:
             return False
-    if knot_vector[polynomial_degree + 1] == knot_vector[0] or\
-       knot_vector[-1 - (polynomial_degree + 1)] == knot_vector[-1]:
+    if (
+        knot_vector[polynomial_degree + 1] == knot_vector[0]
+        or knot_vector[-1 - (polynomial_degree + 1)] == knot_vector[-1]
+    ):
         return False
     return True
 
@@ -226,7 +241,9 @@ def generate_open_knot(control_points_count, polynomial_degree):
         If control_points_count is smaller than polynomial_degree + 1.
     """
     if control_points_count < polynomial_degree + 1:
-        raise ValueError("control_points_count should be at least polynomial_degree + 1")
+        raise ValueError(
+            "control_points_count should be at least polynomial_degree + 1"
+        )
 
     knot_vector = np.zeros(control_points_count + polynomial_degree + 1)
 

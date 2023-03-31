@@ -1,9 +1,11 @@
+import sys
+
 import nurbsvisualizer.bsplinegeometry
 import nurbsvisualizer.nurbsgeometry
 import nurbsvisualizer.utilities
 import nurbsvisualizer.visualizer
-import sys
-sys.path.append('..')
+
+sys.path.append("..")
 
 print("                                                                          \n")
 print("    _   __           __        _    ___                  ___                ")

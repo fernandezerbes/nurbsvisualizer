@@ -1,5 +1,10 @@
 import numpy as np
-from nurbsvisualizer.utilities import replace_nearest, evaluate_bspline_basis, is_non_descending
+
+from nurbsvisualizer.utilities import (
+    evaluate_bspline_basis,
+    is_non_descending,
+    replace_nearest,
+)
 
 
 class BsplineCurve:
@@ -98,7 +103,11 @@ class BsplineCurve:
         if np.ndim(value) != 1:
             raise ValueError("knot_vector should have dimension 1")
         elif np.shape(value)[0] - self.control_points_count < 2:
-            raise ValueError("knot_vector should have at least {} knots".format(self.control_points_count + 2))
+            raise ValueError(
+                "knot_vector should have at least {} knots".format(
+                    self.control_points_count + 2
+                )
+            )
         elif not is_non_descending(value):
             raise ValueError("knot_vector should be in non-descending order")
         elif isinstance(value, np.ndarray):
@@ -167,7 +176,9 @@ class BsplineCurve:
         the knot positions are needed in the case of discontinuous basis functions.
         """
         # Generate an evenly spaced array of samples
-        self._samples = np.linspace(self.knot_vector[0], self.knot_vector[-1], self.samples_count)
+        self._samples = np.linspace(
+            self.knot_vector[0], self.knot_vector[-1], self.samples_count
+        )
 
         # Get the array of distinct knots
         knots_to_replace = self.get_unique_knots()
@@ -213,8 +224,12 @@ class BsplineCurve:
             The array of basis function evaluations.
         """
         # Evaluate the BSpline basis with the Cox-De Boor's algorithm
-        self._basis_evals = evaluate_bspline_basis(self.polynomial_degree, self.knot_vector,
-                                                             self.control_points_count, self.samples)
+        self._basis_evals = evaluate_bspline_basis(
+            self.polynomial_degree,
+            self.knot_vector,
+            self.control_points_count,
+            self.samples,
+        )
 
     @property
     def curve_evals(self):
@@ -330,15 +345,23 @@ class BsplineSurface:
             If value isn't a np.ndarray or a tuple or a list.
         """
         if np.shape(value)[0] != 2:
-            raise ValueError("knot_vector should have one knot vector for each parametric direction")
+            raise ValueError(
+                "knot_vector should have one knot vector for each parametric direction"
+            )
         elif np.ndim(value[0]) != 1 or np.ndim(value[1]) != 1:
             raise ValueError("each knot vector in knot_vector should have dimension 1")
         elif np.shape(value[0])[0] - self.control_points_count[0] < 2:
-            raise ValueError("knot_vector should have at least {} knots in the first direction".format(
-                             self.control_points_count[0] + 2))
+            raise ValueError(
+                "knot_vector should have at least {} knots in the first direction".format(
+                    self.control_points_count[0] + 2
+                )
+            )
         elif np.shape(value[1])[0] - self.control_points_count[1] < 2:
-            raise ValueError("knot_vector should have at least {} knots in the second direction".format(
-                             self.control_points_count[1] + 2))
+            raise ValueError(
+                "knot_vector should have at least {} knots in the second direction".format(
+                    self.control_points_count[1] + 2
+                )
+            )
         elif not is_non_descending(value[0]) or not is_non_descending(value[1]):
             raise ValueError("knot_vector should be in non-descending order")
         elif isinstance(value, np.ndarray):
@@ -358,8 +381,10 @@ class BsplineSurface:
         (int, int)
             The polynomial degree in each parametric direction.
         """
-        return np.shape(self.knot_vector[0])[0] - self.control_points_count[0] - 1,\
-               np.shape(self.knot_vector[1])[0] - self.control_points_count[1] - 1
+        return (
+            np.shape(self.knot_vector[0])[0] - self.control_points_count[0] - 1,
+            np.shape(self.knot_vector[1])[0] - self.control_points_count[1] - 1,
+        )
 
     @property
     def dimensions(self):
@@ -408,8 +433,12 @@ class BsplineSurface:
         the knot positions are needed in the case of discontinuous basis functions.
         """
         # Generate an evenly spaced array of samples for parameter space dimension
-        samples_xi = np.linspace(self.knot_vector[0][0], self.knot_vector[0][-1], self.samples_count[0])
-        samples_eta = np.linspace(self.knot_vector[1][0], self.knot_vector[1][-1], self.samples_count[1])
+        samples_xi = np.linspace(
+            self.knot_vector[0][0], self.knot_vector[0][-1], self.samples_count[0]
+        )
+        samples_eta = np.linspace(
+            self.knot_vector[1][0], self.knot_vector[1][-1], self.samples_count[1]
+        )
 
         # Get the array of distinct knots for each parameter space dimension
         knots_to_replace_xi, knots_to_replace_eta = self.get_unique_knots()
@@ -453,14 +482,28 @@ class BsplineSurface:
     def evaluate_basis(self):
         """Evaluate the B-spline basis functions."""
         # Initialize the array of basis evaluations
-        self._basis_evals = np.zeros((self.control_points_count[0], self.control_points_count[1],
-                                      self.samples_count[0], self.samples_count[1]))
+        self._basis_evals = np.zeros(
+            (
+                self.control_points_count[0],
+                self.control_points_count[1],
+                self.samples_count[0],
+                self.samples_count[1],
+            )
+        )
 
         # Evaluate the BSpline basis for each parameter space dimension with the Cox-De Boor's algorithm
-        evaluations_xi = evaluate_bspline_basis(self.polynomial_degree[0], self.knot_vector[0],
-                                                          self.control_points_count[0], self.samples[0])
-        evaluations_eta = evaluate_bspline_basis(self.polynomial_degree[1], self.knot_vector[1],
-                                                           self.control_points_count[1], self.samples[1])
+        evaluations_xi = evaluate_bspline_basis(
+            self.polynomial_degree[0],
+            self.knot_vector[0],
+            self.control_points_count[0],
+            self.samples[0],
+        )
+        evaluations_eta = evaluate_bspline_basis(
+            self.polynomial_degree[1],
+            self.knot_vector[1],
+            self.control_points_count[1],
+            self.samples[1],
+        )
 
         # Compute the tensor product of basis evaluations in each parameter dimension.
         for n, Ni_evals in enumerate(evaluations_xi):
@@ -486,10 +529,14 @@ class BsplineSurface:
         # Multiply each control point by the corresponding basis function
 
         # Initialize the array of surface evaluations
-        self._surface_evals = np.zeros((self.dimensions, self.samples_count[0], self.samples_count[1]))
+        self._surface_evals = np.zeros(
+            (self.dimensions, self.samples_count[0], self.samples_count[1])
+        )
 
         # Loop over each dimension (x, y, z) and multiply each control point coordinate with the corresponding basis
         for dim, coordinate_grid in enumerate(self.control_points):
             for i in range(self.control_points_count[0]):
                 for j in range(self.control_points_count[1]):
-                    self._surface_evals[dim] += self.control_points[dim][i][j] * self.basis_evals[i][j]
+                    self._surface_evals[dim] += (
+                        self.control_points[dim][i][j] * self.basis_evals[i][j]
+                    )
